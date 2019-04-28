@@ -18,46 +18,37 @@ import java.util.Arrays;
 public class FirebaseUIwithLogin extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
+    private static final int SIGN_IN = 12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_firebase_uiwith_login);
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(Arrays.asList(
-                                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                new AuthUI.IdpConfig.EmailBuilder().build()))
-                        .build(),
-                RC_SIGN_IN);
+        startActivityForResult(AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(
+                        Arrays.asList(
+                                new AuthUI.IdpConfig.EmailBuilder().build(),
+                                new AuthUI.IdpConfig.GoogleBuilder().build()
+                        )).build(), SIGN_IN);
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode==SIGN_IN){
             IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            // Successfully signed in
-            if (resultCode == RESULT_OK) {
-                startActivity(new Intent(FirebaseUIwithLogin.this, KitapActivity_Drawer.class));
-                finish();
-            } else {
-                // Sign in failed
-                if (response == null) {
-                    // User pressed back button
-                    Toast.makeText(this, "iptal edildi", Toast.LENGTH_SHORT).show();
+            if (resultCode==RESULT_OK){
+                //BAŞARILI GİRİŞ
+                startActivity(new Intent(FirebaseUIwithLogin.this,KitapActivity_Drawer.class));
+            }else {
+                if (response==null){
+                    Toast.makeText(this, "giriş başarısız", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    Toast.makeText(this, "internet yok", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Toast.makeText(this, "sign-in error", Toast.LENGTH_SHORT).show();
-                 Log.e("Hata", "Sign-in error: ", response.getError());
             }
         }
     }
+
 }
